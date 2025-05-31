@@ -24,6 +24,8 @@ func new(err error) (newErr Err) {
 		newErr = v
 	default:
 		newErr.Err = v
+		newErr.Func = getFuncName(3)
+		newErr.Source = getSource(3)
 	}
 	return newErr
 }
@@ -36,17 +38,20 @@ func getSource(skip int) string {
 func getFuncName(skip int) string {
 	pc, _, _, _ := runtime.Caller(skip)
 	caller := runtime.FuncForPC(pc)
-	if caller != nil {
+	if caller == nil {
 		return ""
 	}
 	callerName := caller.Name()
 	return callerName[strings.LastIndex(callerName, "/")+1:]
 }
 
+// original error will be put on top, current trace will be added last
 func AddTrace(err error, errs ...Err) Err {
 	newErr := new(err)
 
-	newErr.Func = getFuncName(3)
-	newErr.Source = getSource(3)
+	newErr.Traces = append(newErr.Traces, Err{
+		Func:   getFuncName(2),
+		Source: getSource(2),
+	})
 	return newErr
 }
