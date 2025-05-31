@@ -15,7 +15,13 @@ type Err struct {
 }
 
 func (e Err) Error() string {
-	return e.Err.Error()
+	sources := make([]string, len(e.Traces))
+	funcs := make([]string, len(e.Traces))
+	for i := range e.Traces {
+		sources[i] = fmt.Sprintf("\"%s\"", e.Traces[i].Source)
+		funcs[i] = fmt.Sprintf("\"%s\"", e.Traces[i].Func)
+	}
+	return fmt.Sprintf("{\"Error\": \"%s\", \"Code\": \"%s\", \"Sources\": %v, \"Funcs\": %v}", e.Err.Error(), e.Code, sources, funcs)
 }
 
 func new(err error) (newErr Err) {

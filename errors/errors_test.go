@@ -2,6 +2,7 @@ package errors
 
 import (
 	"errors"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
@@ -98,4 +99,20 @@ func TestAddTrace(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPrintErr(t *testing.T) {
+	err := Err{
+		Err: errors.New("test"),
+		Traces: []Err{
+			{
+				Source: "anotherSource",
+				Func:   "anotherFunc",
+			},
+		},
+		Source: "anotherSource",
+		Func:   "anotherFunc",
+	}
+
+	assert.Equal(t, "{\"Error\": \"test\", \"Code\": \"\", \"Sources\": [\"anotherSource\"], \"Funcs\": [\"anotherFunc\"]}", fmt.Sprintf("%v", err))
 }
